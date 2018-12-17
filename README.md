@@ -1,4 +1,5 @@
 # stagparser - generic parser for golang struct tag
+[![GoDoc](https://godoc.org/github.com/yuin/stagparser?status.svg)](https://godoc.org/github.com/yuin/stagparser)
 
 Package stagparser provides a generic parser for golang struct tag.
 stagparser can parse tags like the following:
