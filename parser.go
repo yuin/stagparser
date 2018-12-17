@@ -41,7 +41,6 @@
 //    definitions, err := stagparser.ParseStruct(user)
 //  }
 // """
-
 package stagparser
 
 import (
