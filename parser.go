@@ -268,7 +268,7 @@ func ParseTag(value string, name string) ([]Definition, error) {
 	return p.Parse(value)
 }
 
-// ParseStruct parses struct tags of given object.
+// ParseStruct parses struct tags of given object. map key is a field name.
 func ParseStruct(obj interface{}, tag string) (map[string][]Definition, error) {
 	result := map[string][]Definition{}
 	r := reflect.ValueOf(obj)
