@@ -7,7 +7,7 @@ stagparser can parse tags like the following:
 - `validate:"required,length(min=1, max=10)"`
 - `validate:"max=10,list=[apple,'star fruits']"`
 
-tags are consist of 'definition'. 'definition' has 3 forms:
+tags consist of 'definition'. 'definition' has 3 forms:
 
 - name only: `required`
 - name with a single attribute: `max=10`
