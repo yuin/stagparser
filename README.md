@@ -7,7 +7,7 @@ stagparser can parse tags like the following:
 - `validate:"required,length(min=1, max=10)"`
 - `validate:"max=10,list=[apple,'star fruits']"`
 
-tags are consists of 'definition'. 'definition' have 3 forms:
+tags are consist of 'definition'. 'definition' has 3 forms:
 
 - name only: `required`
 - name with a single attribute: `max=10`
@@ -24,7 +24,7 @@ a string quoted by `'` and an array.
   * identifiers are interpreted as string in value context
 * array: `[1, 2, aaa]`
 
-You can parse objects just call ParseStruct:
+You can parse objects just calling ParseStruct:
 
 ```
 import "github.com/yuin/stagparser"
