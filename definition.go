@@ -1,6 +1,6 @@
 package stagparser
 
-// Definition is a struct tag value element
+// Definition is a struct tag value element.
 type Definition interface {
 	// Name is a name of the definition
 	Name() string

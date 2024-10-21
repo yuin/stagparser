@@ -1,38 +1,38 @@
 // Package stagparser provides a generic parser for golang struct tag.
 // stagparser can parse tags like the following:
 //
-//   * `validate:"required,length(min=1, max=10)"`
-//   * `validate:"max=10,list=[apple,'star fruits']"`
+//   - `validate:"required,length(min=1, max=10)"`
+//   - `validate:"max=10,list=[apple,'star fruits']"`
 //
 // tags are consists of 'definition'. 'definition' have 3 forms:
 //
-//  * name only: required
-//  * name with a single attribute: max=10
-//      * in this case, parse result is name="max", attributes={"max":10}
-//  * name with multiple attributes: length(min=1, max=10)
+//   - name only: required
+//   - name with a single attribute: max=10
+//   - in this case, parse result is name="max", attributes={"max":10}
+//   - name with multiple attributes: length(min=1, max=10)
 //
 // name and attribute must be a golang identifier.
 // An attribute value must be one of an int64, a float64, an identifier,
 // a string quoted by "'" and an array.
 //
-//  * int64: 123
-//  * float64: 111.12
-//  * string: 'ab\tc'
-//    * identifiers are interpreted as string in value context
-//  * array:  [1, 2, aaa]
+//   - int64: 123
+//   - float64: 111.12
+//   - string: 'ab\tc'
+//   - identifiers are interpreted as string in value context
+//   - array:  [1, 2, aaa]
 //
 // You can parse objects just call ParseStruct:
 //
-//  import "github.com/yuin/stagparser"
+//	import "github.com/yuin/stagparser"
 //
-//  type User struct {
-//    Name string `validate:"required,length(min=4,max=10)"`
-//  }
+//	type User struct {
+//	  Name string `validate:"required,length(min=4,max=10)"`
+//	}
 //
-//  func main() {
-//    user := &User{"bob"}
-//    definitions, err := stagparser.ParseStruct(user)
-//  }
+//	func main() {
+//	  user := &User{"bob"}
+//	  definitions, err := stagparser.ParseStruct(user)
+//	}
 package stagparser
 
 import (
@@ -44,7 +44,7 @@ import (
 	"text/scanner"
 )
 
-// ParseError is an error indicating invalid tag value
+// ParseError is an error indicating invalid tag value.
 type ParseError interface {
 	error
 	// Source is a source name
@@ -104,7 +104,7 @@ func (p *parser) Parse(tag string) ([]Definition, error) {
 		case scanner.Ident:
 			ident := p.s.TokenText()
 			if p.s.Peek() == '=' {
-				p.s.Next()
+				_ = p.s.Next()
 				value, err := p.parseValue()
 				if err != nil {
 					return nil, err
@@ -114,7 +114,7 @@ func (p *parser) Parse(tag string) ([]Definition, error) {
 				}
 				result = append(result, newDefinition(ident, arg))
 			} else if p.s.Peek() == '(' {
-				p.s.Next()
+				_ = p.s.Next()
 				arg, err := p.parseArgs()
 				if err != nil {
 					return nil, err
@@ -150,21 +150,34 @@ func (p *parser) parseValue() (interface{}, error) {
 		switch tok {
 		case scanner.Ident:
 			return p.s.TokenText(), nil
-		case scanner.String, scanner.Int, scanner.Float:
+		case scanner.String, scanner.Int, scanner.Float, '-':
+			mul := 1
+			if tok == '-' {
+				mul = -1
+				tok = p.s.Scan()
+			}
 			if tok == scanner.String {
 				str := p.s.TokenText()
 				return str[1 : len(str)-1], nil
 			} else if tok == scanner.Int {
-				return strconv.ParseInt(p.s.TokenText(), 10, 64)
+				v, err := strconv.ParseInt(p.s.TokenText(), 10, 64)
+				if err != nil {
+					return nil, err
+				}
+				return int64(mul) * v, err
 			} else if tok == scanner.Float {
-				return strconv.ParseFloat(p.s.TokenText(), 64)
+				v, err := strconv.ParseFloat(p.s.TokenText(), 64)
+				if err != nil {
+					return nil, err
+				}
+				return float64(mul) * v, err
 			}
 		default:
-			fmt.Printf("%d, %s\n", tok, string(tok))
-			return nil, p.parseError(fmt.Sprintf("invalid value: %s", p.s.TokenText()))
+			return nil, p.parseError(fmt.Sprintf("invalid value: '%s'", p.s.TokenText()))
 		}
 	}
-	return nil, p.parseError("invalid value")
+	return nil, p.parseError(fmt.Sprintf("invalid value: '%s'",
+		string([]rune{p.s.Peek()})))
 }
 
 func (p *parser) parseString(_ rune) (string, error) {

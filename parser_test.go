@@ -1,12 +1,14 @@
-package stagparser
+package stagparser_test
 
 import (
 	"testing"
+
+	. "github.com/yuin/stagparser"
 )
 
 type StructA struct {
-	f1 string `t1:"abc=1,def=ghi,jkl='mno',pkr=[1, aaa, bbb],stu(vwx=ccc, zzz=ddd), a1"`
-	f2 string `t1:"abd='\\r\\n\\''"`
+	f1 string `t1:"abc=1,def=ghi,jkl='mno',pkr=[1, -100.009, aaa, bbb, -56],stu(vwx=ccc, zzz=ddd), a1"` // nolint
+	f2 string `t1:"abd='\\r\\n\\''"`                                                                    // nolint
 }
 
 func TestExampleSuccess(t *testing.T) {
@@ -69,17 +71,23 @@ func TestExampleSuccess(t *testing.T) {
 		if !ok2 {
 			t.Fatalf("pkr attribute should be []interface{} but got %T", v)
 		}
-		if len(v2) != 3 {
-			t.Fatalf("pkr attribute should be [3]interface{} but [%d]interface{}", len(v2))
+		if len(v2) != 5 {
+			t.Fatalf("pkr attribute should be [5]interface{} but [%d]interface{}", len(v2))
 		}
 		if v2[0].(int64) != 1 {
 			t.Fatalf("pkr attribute[0] should be 1(int64) but got %v(%T)", v, v)
 		}
-		if v2[1].(string) != "aaa" {
-			t.Fatalf("pkr attribute[1] should be \"aaa\" but got %v(%T)", v, v)
+		if v2[1].(float64) != -100.009 {
+			t.Fatalf("pkr attribute[1] should be 100.009(float64) but got %v(%T)", v, v)
 		}
-		if v2[2].(string) != "bbb" {
-			t.Fatalf("pkr attribute[1] should be \"bbb\" but got %v(%T)", v, v)
+		if v2[2].(string) != "aaa" {
+			t.Fatalf("pkr attribute[2] should be \"aaa\" but got %v(%T)", v, v)
+		}
+		if v2[3].(string) != "bbb" {
+			t.Fatalf("pkr attribute[3] should be \"bbb\" but got %v(%T)", v, v)
+		}
+		if v2[4].(int64) != -56 {
+			t.Fatalf("pkr attribute[4] should be 56(int64) but got %v(%T)", v, v)
 		}
 	}
 
