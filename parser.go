@@ -120,7 +120,7 @@ func (p *parser) Parse(tag string) ([]Definition, error) {
 					return nil, err
 				}
 				result = append(result, newDefinition(ident, arg))
-			} else if p.s.Peek() == scanner.EOF {
+			} else if p.s.Peek() == scanner.EOF || p.s.Peek() == ',' {
 				result = append(result, newDefinition(ident, map[string]interface{}{}))
 			}
 		case ',':

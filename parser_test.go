@@ -9,6 +9,7 @@ import (
 type StructA struct {
 	f1 string `t1:"abc=1,def=ghi,jkl='mno',pkr=[1, -100.009, aaa, bbb, -56],stu(vwx=ccc, zzz=ddd), a1"` // nolint
 	f2 string `t1:"abd='\\r\\n\\''"`                                                                    // nolint
+	f3 string `t1:"aaa,bbb"`                                                                            // nolint
 }
 
 func TestExampleSuccess(t *testing.T) {
@@ -130,5 +131,21 @@ func TestExampleSuccess(t *testing.T) {
 	}
 	if v, ok := abd.Attribute("abd"); !ok || v.(string) != "\r\n'" {
 		t.Fatalf("zzz attribute should be \"\\r\\n'\" but got %v(%T)", v, v)
+	}
+
+	f3, ok := result["f3"]
+	if !ok {
+		t.Fatalf("field f3 should be parsed")
+	}
+	if len(f3) != 2 {
+		t.Fatalf("field f3 should be parsed into 2 definitions but %d", len(f3))
+	}
+	aaa := f3[0]
+	if aaa.Name() != "aaa" {
+		t.Fatalf("1st f3 definition should be 'aaa'")
+	}
+	bbb := f3[1]
+	if bbb.Name() != "bbb" {
+		t.Fatalf("2nd f3 definition should be 'bbb'")
 	}
 }
